@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <center>
+        <font size=2>
+            <h1>RNG BASED GAMES</h1>
+        </font>
+    </center>
+    A website made by Spandan.
+    This website consists of 2 text based games.
+    <field id="mainmenu">
+    	<center>
+        <form name="f1"><br><br>
+            <button title="Snakes and Ladders" style="display:inline-block" onclick="snlHTML()">
+                <img src="snl.png" height=200 width=200>
+            </button>
+            <button title="Rock Paper Scissors" style="display:inline-block" onclick="rpsHTML()">
+                <img src="rps.png" height=200 width=200>
+            </button>
+            <br />
+        </form>
+    	</center>
+    </field>
+    <script>
+    	var ct = 0;
+    	var Players = [{name: "", pos: ""}, {name: "", pos: ""}];
+        var curmoney;
+        var positionShowBool = true;
+        var ladderp = [7, 31, 21, 42, 79]; // These are the positions where the Ladders are
+        var laddershift = [22, 87, 37, 95, 86]; // And the respective positions where the ladders take you to
+        var snakep = [99, 44, 75, 54, 81]; // Same for the snakes.
+        var snakeshift = [6, 29, 15, 13, 18]; //You go down as you hit a snake.
+        var rpswin = 0, comprpswin = 0, rpstie = 0; // Counting the wins, losses and ties.
+        function snlHTML() {
+        	var retHTML = "<ul>";
+			retHTML += "<li>This is a two player game.</li>";
+			retHTML += "<li>Both the players roll dice. </li>";
+			retHTML += "<li>The players advance with the numbers on the dice. </li>";
+			retHTML += "<li>If a player lands on a snake, he goes down, while if he lands on a ladders, he goes up. </li>";
+			retHTML += "<li>The goal is to reach 100 first.</li></ul>";
+			retHTML += "Please enter the names of the two players:"
+			retHTML += "<center> <form name=\"f2\"><input type=\"text\" name=\"i1\" placeholder =\"Player 1\">         <input type=\"text\" name=\"i2\" placeholder=\"Player 2\"></form>"
+			retHTML += "<br><br><input type = \"button\" onclick=\"snl()\" value=\"Play!\">";
+			retHTML += "<br><br><input type = \"button\" onclick=\"goToMainMenu()\" value=\"Main Menu\"></center>"
+			document.getElementById('mainmenu').innerHTML = retHTML;
+        }
+
+        function rpsHTML() {
+        	var retHTML = "<ul>";
+			retHTML += "<li>You play the traditional rock paper scissors game with the computer.</li>";
+			retHTML += "<li>You enter eighter rock, paper, or scissors, and the computer randomly generates of of these choices.</li>";
+			retHTML += "<li>Scissor beats paper. Paper beats Rock. And Rock beats Scissors.</li>";
+			retHTML += "<li>You may play as many times as you want.</li>";
+			retHTML += "<li>At the end,the results are displayed.</li></ul>";
+			retHTML += "<center> <br><input type = \"button\" onclick=\"rps()\" value=\"Play!\">";
+			retHTML += "<br><br><input type = \"button\" onclick=\"goToMainMenu()\" value=\"Main Menu\"></center>"
+			rpswin = 0;
+			comprpswin = 0;
+			rpstie = 0;
+			document.getElementById('mainmenu').innerHTML = retHTML;
+        }
+
+        function goToMainMenu () {
+        	document.getElementById('mainmenu').innerHTML = "<center><form name=\"f1\"><br><br><button title=\"Snakes and Ladders\" style=\"display:inline-block\" onclick=\"snlHTML()\"><img src=\"snl.png\" height=200 width=200></button> <button title=\"Rock Paper Scissors\" style=\"display:inline-block\" onclick=\"rpsHTML()\"><img src=\"rps.png\" height=200 width=200></button></form></center>";
+        }
+
+		function rps () {
+			var retHTML = "<center><field id=\"rpsScore\">Player: " + rpswin + "  Computer: " + comprpswin + "   Ties:" + rpstie + "</field></center>";
+			retHTML += "<center><field id=\"gameData\"><button title=\"Rock\" style=\"display:inline-block\" onclick=\"userTurn(0)\"><img src=\"stone.png\" height=100 width=100></button>   <button title=\"Paper\" style=\"display:inline-block\" onclick=\"userTurn(1)\"><img src=\"paper.png\" height=100 width=100></button>   <button title=\"Scissor\" style=\"display:inline-block\" onclick=\"userTurn(2)\"><img src=\"scissors.png\" height=100 width=100></button><br><br><input type=\"button\" onclick=\"endRPS()\" value=\"End Game\"></field><br><br><input type = \"button\" onclick=\"goToMainMenu()\" value=\"Main Menu\"></center>";
+			document.getElementById('mainmenu').innerHTML = retHTML;
+		}
+
+		function snl () {
+			Players[0].name = document.f2.i1.value;
+			Players[1].name = document.f2.i2.value;
+			Players[0].pos = 1;
+			Players[1].pos = 1;
+			var retHTML = "<input type = \"button\" onclick=\"positionShowToggle()\" value=\"(Toggle Positions)\"><center>";
+			retHTML += "<field id=\"rulesShow\">The first player to reach 100 wins the game!";
+			retHTML += "The Snakes are at the following positions: <br>";
+		    for (var i = 0;i < 5; i++) {
+		        retHTML += snakep[i] + " --------> " + snakeshift[i] + "<br>";
+		    }
+		    retHTML += "The Ladders are at the following positions: <br>";
+		    for (var i = 0;i < 5; i++) {
+		        retHTML += ladderp[i] + " --------> " + laddershift[i] + "<br>";
+		    }
+			retHTML += "</field><field id=\"Stats\">Positions - Player 1: " + Players[0].pos + " Player 2: " + Players[1].pos + "</field><br><br><field id=\"snl\"><input type = \"button\" onclick=\"SnakesLadders(0)\" value=\"GO\"></field><br><br><input type = \"button\" onclick=\"goToMainMenu()\" value=\"Main Menu\"></center>";
+			document.getElementById('mainmenu').innerHTML = retHTML;
+		}
+
+        function SnakesLadders (ctt) {
+        	ct = ctt;
+    		var retHTML = "<font size=\"5\">" + Players[ct].name + "'s Turn.</font><br><br> <field id=\"turn\"></field>";
+    		document.getElementById("snl").innerHTML = retHTML;
+            var first=dice();  
+            var second=dice();// We're rolling two dies here
+            retHTML = "\u2605"+"Got " + first + " on the first dice and " + second + " on the second dice!<br><br>";
+            Players[ct].pos += + first + second;
+            retHTML += "<font size = 5 color=\"green\">Now you're on " + Players[ct].pos + "!</font>";
+            updateSNL();
+            document.getElementById('turn').innerHTML = retHTML;
+            updateSNL();
+            Snakes(ct); //These functions identify the positions and apply the Snakes and Ladders.
+            Ladders(ct);
+            updateSNL();
+            if (Players[0].pos >= 100 || Players[1].pos >= 100) {
+            	for (var i = 0; i < 2; i++) {
+            		document.getElementById("snl").innerHTML = "<center><strong><font size=5 color=\"green\">Player " + (i + 1) + "Wins!</font></strong></center>";
+            	}
+            	return;
+            }
+            document.getElementById('turn').innerHTML += "<br><br><input type=\"button\" onclick=\"SnakesLadders(ct === 0 ? 1 : 0)\" value=\"Player " + (ct + 1) + " Dice Roll\">";
+        }
+
+	    function Snakes (ct) {
+	       for(var i in snakep) {
+                if(Players[ct].pos === snakep[i]) {
+                    Players[ct].pos = snakeshift[i];
+                    retHTML = "<br><font color=\"red\" size=4>-------------------------------------------------------------<br>";
+                    retHTML += "----->" + Players[ct].name + " got eaten by a snake and reached " + Players[ct].pos + "!<br>";
+                    retHTML += "-------------------------------------------------------------</font>";
+                    document.getElementById("turn").innerHTML += retHTML;
+                    return;
+                }
+            }
+	    }
+
+	    function Ladders (ct) {
+	       for(var i in snakep) {
+                if(Players[ct].pos === snakep[i]) {
+                    Players[ct].pos = snakeshift[i];
+                    retHTML = "<br><font color=\"green\" size=4>-------------------------------------------------------------<br>";
+                    retHTML += "----->\u2605" + Players[ct].name + " climbed a ladder and reached " + Players[ct].pos + "!<br>";
+                    retHTML += "-------------------------------------------------------------</font>";
+                    document.getElementById("turn").innerHTML += retHTML;
+                    return;
+                }
+            }
+	    }
+
+        function resetTurn () {
+        	document.getElementById("turn").innerHTML = "";
+        }
+
+        function dice () {
+        	var r = Math.random();
+			var diceno = 0;
+			if(r>(0.0/6.0) && r<= (1.0/6.0))
+				diceno = 1;
+			if(r>(1.0/6.0) && r<= (2.0/6.0))
+				diceno = 2;
+			if(r>(2.0/6.0) && r<= (3.0/6.0))
+				diceno = 3;
+			if(r>(3.0/6.0) && r<= (4.0/6.0))
+				diceno = 4;
+			if(r>(4.0/6.0) && r<= (5.0/6.0))
+				diceno = 5;
+			if(r>(5.0/6.0) && r<= (6.0/6.0))
+				diceno = 6;
+			return diceno;
+		}
+
+		function computerturn () {
+			var rps=Math.random();
+			var rpss = "";
+			if( rps > (0.0/3.0) && rps < (1.0/3.0))
+			rpss= "Rock";
+			else if( rps >= (1.0/3.0) && rps < (2.0/3.0))
+			rpss= "Paper";
+			else if( rps >= (2.0/3.0) && rps < 1.0)
+			rpss= "Scissors";
+			return rpss;
+		}
+
+		function updateSNL () {
+			document.getElementById('Stats').innerHTML = "<font color=\"red\">Positions - Player 1: " + Players[0].pos + " Player 2: " + Players[1].pos + "</font>";
+		}
+
+		function userTurn (val) {
+			var options = ["Rock", "Paper", "Scissors"], loseTo = ["Paper", "Scissors", "Rock"], winTo = ["Scissors", "Rock", "Paper"];
+			var compChoice = computerturn();
+			var retHTML = "<font color = \"yellow\" size=5>You chose " + options[val] + "</font><br><br><font color = \"blue\" size=5>Computer Chose " + compChoice + ".</font><br><br>";
+			if (compChoice === options[val]) {
+				retHTML += "<font size=4 color=\"#ffff00\">Its a tie!!</font>";
+				rpstie++;
+			} else if (compChoice === loseTo[val]) {
+				retHTML += "<font size=4 color=\"red\">Computer Wins!!</font>";
+				comprpswin++;
+			} else if (compChoice === winTo[val]) {
+				retHTML += "<font size=4 color=\"green\">Player Wins!!</font>";
+				rpswin++;
+			}
+			document.getElementById('gameData').innerHTML = retHTML + "<br><br><input type=\"button\" onclick=\"rps()\" value=\"Next Round\">";
+		}
+
+		function endRPS () {
+			document.getElementById('rpsScore').innerHTML = "<font color=\"#ffff00\" size=5>Player: " + rpswin + "  Computer: " + comprpswin + "   Ties:" + rpstie + "</font>";
+			if (comprpswin > rpswin) {
+				document.getElementById('gameData').innerHTML = "<font color=\"red\" size=5>Computer Wins!</font>";
+			} else if (rpswin > comprpswin) {
+				document.getElementById('gameData').innerHTML = "<font color=\"green\" size=5>You Win!</font>";
+			} else {
+				document.getElementById('gameData').innerHTML = "<font color=\"yellow\" size=5>Its a tie!</font>";
+			}
+		}
+
+		function positionShowToggle () {
+			if (positionShowBool) {
+				positionShowBool = false;
+				document.getElementById('rulesShow').innerHTML =  "";
+				return;
+			}
+			positionShowBool = true;
+			var retHTML = "";
+			retHTML += "The first player to reach 100 wins the game!";
+        	retHTML += "The Snakes are at the following positions: <br>";
+            for (var i = 0;i < 5; i++) {
+                retHTML += snakep[i] + " --------> " + snakeshift[i] + "<br>";
+            }
+            retHTML += "The Ladders are at the following positions: <br>";
+            for (var i = 0;i < 5; i++) {
+                retHTML += ladderp[i] + " --------> " + laddershift[i] + "<br>";
+            }
+			document.getElementById('rulesShow').innerHTML = retHTML;
+		}
+    </script>
+</body>
+</html>
